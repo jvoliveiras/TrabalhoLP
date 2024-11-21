@@ -32,7 +32,7 @@ public class CasaDeRepousoMain {
                     adicionarPessoa();
                     break;
                 case '3':
-                    alterarDadosMain();
+                    menuAlterarDadosPessoa();
                     break;
                 case '7':
                     System.out.println();
@@ -267,7 +267,7 @@ public class CasaDeRepousoMain {
         }
     }
 
-    static void alterarDadosMain() {
+    static void menuAlterarDadosPessoa() {
         String pessoaASerAlterada, opcao, novaInfo;
 
         listaPessoasCadastradas();
@@ -289,19 +289,22 @@ public class CasaDeRepousoMain {
                 case "1":
                     System.out.println("\nInforme o novo nome: ");
                     novaInfo = scan.next();
-                    alterarNome(pessoaASerAlterada, novaInfo);
+                    AlterarDadosPessoa(pessoaASerAlterada, novaInfo, "nome");
                     break;
                 case "2":
                     System.out.println("\nInforme a nova data de nascimento: ");
                     novaInfo = scan.next();
+                    AlterarDadosPessoa(pessoaASerAlterada, novaInfo, "dataNascimento");
                     break;
                 case "3":
                     System.out.println("\nInforme a nova data de entrada: ");
                     novaInfo = scan.next();
+                    AlterarDadosPessoa(pessoaASerAlterada, novaInfo, "dataEntrada");
                     break;
                 case "4":
                     System.out.println("\nInforme o novo quarto do cliente: ");
                     novaInfo = scan.next();
+                    AlterarDadosPessoa(pessoaASerAlterada, novaInfo, "quarto");
                     break;
                 default:
                     System.out.println("\nOpção Inválida!");
@@ -313,7 +316,7 @@ public class CasaDeRepousoMain {
 
     }
 
-    static void alterarNome(String nomeProcurado, String novoNome){
+    static void AlterarDadosPessoa(String nomeProcurado, String novaInfo, String campoASerAlterado){
 		int inicio, fim, ultimo, primeiro;
         String nome, dataNasc, dataEntrada, quartoVinculado;
 		boolean achou=false;
@@ -339,7 +342,22 @@ public class CasaDeRepousoMain {
 
 				Pessoa pessoa = new Pessoa(nome, dataNasc, dataEntrada, Integer.parseInt(quartoVinculado));
 				if (nomeProcurado.equals(pessoa.getNome())){
-					pessoa.setNome(novoNome);
+                    if(campoASerAlterado.equals("nome")) {
+                        pessoa.setNome(novaInfo);
+                    }
+
+                    if(campoASerAlterado.equals("dataNascimento")) {
+                        pessoa.setDataNascimento(novaInfo);
+                    }
+
+                    if(campoASerAlterado.equals("dataEntrada")) {
+                        pessoa.setDataEntrada(novaInfo);
+                    }
+
+                    if(campoASerAlterado.equals("quarto")) {
+                        pessoa.setNumAcomodacao(Integer.parseInt(novaInfo));
+                    }
+					
 					memoriaPessoas.replace(inicio, fim+1, pessoa.toString());
 					gravarDados(ARQUIVO_PESSOAS, memoriaPessoas); 
 					achou = true;
