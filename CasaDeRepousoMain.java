@@ -34,6 +34,9 @@ public class CasaDeRepousoMain {
                 case '3':
                     menuAlterarDadosPessoa();
                     break;
+                case '4':
+                    excluirDadosPessoa();
+                    break;
                 case '7':
                     System.out.println();
                     break;
@@ -274,7 +277,7 @@ public class CasaDeRepousoMain {
 
         System.out.println("\nInforme o nome da pessoa que deseja alterar alguma informação: ");
         pessoaASerAlterada = scan.next();
-        //Verificar se a pessoa existe
+
         while(true){
             System.out.println("\nQual infomração deseja alterar?" +
             "\n1 - Nome" +
@@ -373,6 +376,67 @@ public class CasaDeRepousoMain {
 		}else{
 			System.out.println("\narquivo vazio");
 		}
+
+    }
+
+    static void excluirDadosPessoa() {
+        int inicio, fim, ultimo, primeiro;
+        String pessoaASerExcluida;
+        String nome, dataNasc, dataEntrada, quartoVinculado;
+		boolean achou=false;
+        char resp;
+
+        listaPessoasCadastradas();
+
+        System.out.println("\nInforme o nome da pessoa que deseja excluir: ");
+        pessoaASerExcluida = scan.next();
+
+        if (memoriaPessoas.length() != 0) { 
+
+			inicio = 0;
+			while ((inicio != memoriaPessoas.length()) && (!achou)) {
+				ultimo = memoriaPessoas.indexOf ("\t", inicio);
+				nome = memoriaPessoas.substring(inicio, ultimo);
+
+                primeiro = ultimo + 1;
+				ultimo = memoriaPessoas.indexOf ("\t", primeiro); 
+				dataNasc = memoriaPessoas.substring(primeiro, ultimo);	
+
+				primeiro = ultimo + 1;
+                ultimo = memoriaPessoas.indexOf ("\t", primeiro); 
+				dataEntrada = memoriaPessoas.substring(primeiro, ultimo);	
+
+                primeiro = ultimo + 1;
+                fim = memoriaPessoas.indexOf ("\n", primeiro);
+				quartoVinculado = memoriaPessoas.substring(primeiro, fim);
+
+                Pessoa pessoa = new Pessoa(nome, dataNasc, dataEntrada, Integer.parseInt(quartoVinculado));
+                if (nome.equalsIgnoreCase(pessoaASerExcluida)){
+					System.out.println("\n\nDeseja excluir?"+"\n"+"Digite S ou N"+"\n\n"+
+							"  Nome: "+pessoa.getNome()+
+							"  Data Nascimento: " +pessoa.getDataNascimento()+
+							"  Data de Entrada: "+pessoa.getDataEntrada() + 
+                            "  Quarto: "+pessoa.getNumAcomodacao());
+					resp = Character.toUpperCase(scan.next().charAt(0));
+					if (resp == 'S'){
+						memoriaPessoas.delete (inicio, fim + 1);	
+						System.out.println("Registro excluido.");
+						gravarDados(ARQUIVO_PESSOAS, memoriaPessoas); 
+					} else{
+						System.out.println("Exclusao cancelada.");
+					}
+					achou = true;
+				}
+
+                inicio = fim + 1;
+            }
+
+            if (!achou){
+				System.out.println("\n Pessoa não encontrada");
+			}
+        } else {
+            System.out.println("\narquivo vazio");
+        }
 
     }
 
