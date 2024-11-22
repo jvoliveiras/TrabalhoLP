@@ -30,36 +30,37 @@ public class CasaDeRepousoMain {
     
             switch (menu) {
                 case '1':
-                    adicionarAcomodacao();
+                    menuAdicionarAcomodacao();
                     break;
                 case '2':
-                    adicionarPessoa();
+                    menuAdicionarPessoa();
                     break;
                 case '3':
                     menuAlterarDadosPessoa();
                     break;
                 case '4':
-                    excluirDadosPessoa();
+                    menuExcluirDadosPessoa();
                     break;
                 case '5':
+                    menuConsultarDados();
                     break;
                 case '6':
                     break;
                 case '7':
-                    System.out.println();
+                    System.out.println("\nPrograma encerrado!");
                     break;
-                case 'a':
-                 System.out.println("aaaaaaaaa");
                 default:
+                    System.out.println("\nDigite uma das opcoes disponiveis.");
                     break;
             }
         } while (menu != '7');
     }
 
-    static void adicionarAcomodacao() {
+    static void menuAdicionarAcomodacao() {
         String tipo, numAcomodacao;
         boolean estaDisponivel = true;
         double preco;
+        int numAcomod;
         try {
             while (true) {
                 System.out.println("\nInforme o tipo do quarto: (individual, duplo ou triplo)");
@@ -70,21 +71,29 @@ public class CasaDeRepousoMain {
                     System.out.println("\nTipo de quarto inválido, tente novamente.");
                 }
             }
-            //to_do: integer no try/while
-            System.out.println("\nInforme o número do quarto: ");
-            numAcomodacao = scan.next();
+            while (true) {
+                System.out.println("\nInforme o número do quarto: ");
+                numAcomodacao = scan.next();
+                try {
+                    numAcomod = Integer.parseInt(numAcomodacao);
+                    break;
+                } catch (Exception e) {
+                    System.out.println("\nDigite um numero!");
+                }
+            }
             System.out.println("\nInforme o preço mensal do quarto: ");
             preco = scan.nextDouble();
 
-            Acomodacao acomodacao = new Acomodacao(estaDisponivel, preco, tipo, Integer.parseInt(numAcomodacao));
+            Acomodacao acomodacao = new Acomodacao(estaDisponivel, preco, tipo, numAcomod);
             memoriaAcomodacoes.append(acomodacao.toString());
             gravarDados(ARQUIVO_ACOMODACAO, memoriaAcomodacoes);
+            System.out.println("\nAcomodacao adicionada com sucesso! ");
         } catch (Exception e) {
             System.out.println("\nErro de gravação");
         }
     }
     
-    static void adicionarPessoa() {
+    static void menuAdicionarPessoa() {
         String nome, dataNascimento, dataEntrada, numAcomodacao;
         try {
             if (existemAcomodacoesDisponiveis()) {
@@ -110,6 +119,7 @@ public class CasaDeRepousoMain {
                 memoriaPessoas.append(pessoa.toString());
                 adicionarUmaPessoaNaAcomodacao(numAcomodacao);
                 gravarDados(ARQUIVO_PESSOAS, memoriaPessoas);
+                System.out.println("\nPessoa cadastrada com sucesso! ");
             } else {
                 System.out.println("\nNão há acomodacoes disponíveis. ");
             }
@@ -118,14 +128,187 @@ public class CasaDeRepousoMain {
         }
     }
 
-    public static void mostrarAcomodacoesDisponiveis() {
+    static void menuAlterarDadosPessoa() {
+        String pessoaASerAlterada, opcao, novaInfo;
+        boolean naoAlterou = true;
+        mostrarPessoasCadastradas();
+
+        if (memoriaPessoas.length() > 0) {
+            while (true) {
+                System.out.println("\nInforme o nome da pessoa que deseja alterar alguma informação: ");
+                pessoaASerAlterada = scan.next();
+
+                if (validarPessoa(pessoaASerAlterada)) {
+                    break;
+                } else {
+                    System.out.println("\nNome informado nao cadastrado, tente novamente!");
+                }
+            }
+            
+            do {
+                System.out.println("\nQual informação deseja alterar?" +
+                "\n1 - Nome" +
+                "\n2 - Data de Nascimento" +
+                "\n3 - Data de Entrada" +
+                "\n4 - Quarto do cliente");
+
+                opcao = scan.next();
+
+                switch (opcao) {
+                    case "1":
+                        System.out.println("\nInforme o novo nome: ");
+                        novaInfo = scan.next();
+                        alterarDadosPessoa(pessoaASerAlterada, novaInfo, "nome");
+                        naoAlterou = false;
+                        break;
+                    case "2":
+                        System.out.println("\nInforme a nova data de nascimento: ");
+                        novaInfo = scan.next();
+                        alterarDadosPessoa(pessoaASerAlterada, novaInfo, "dataNascimento");
+                        naoAlterou = false;
+                        break;
+                    case "3":
+                        System.out.println("\nInforme a nova data de entrada: ");
+                        novaInfo = scan.next();
+                        alterarDadosPessoa(pessoaASerAlterada, novaInfo, "dataEntrada");
+                        naoAlterou = false;
+                        break;
+                    case "4":
+                        if (existemAcomodacoesDisponiveis()) {
+                            while (true) {
+                                mostrarAcomodacoesDisponiveis();
+                                System.out.println("\nInforme o novo quarto do cliente: ");
+                                novaInfo = scan.next();
+                                if (validarAcomodacao(novaInfo)) {
+                                    alterarDadosPessoa(pessoaASerAlterada, novaInfo, "quarto");
+                                    break;
+                                } else {
+                                    System.out.println("\nNúmero inválido, tente novamente.");
+                                }
+                            }
+                        } else {
+                            System.out.println("\nNão há acomodacoes disponíveis. ");
+                        }
+                        naoAlterou = false;
+                        break;
+                    default:
+                        System.out.println("\nOpção Inválida!");
+                }
+            } while (naoAlterou);
+        }
+    }
+
+    static void menuExcluirDadosPessoa() {
         int inicio, fim, ultimo, primeiro;
-        String numQuarto, valor, disponivel, tipo, pessoasNoQuarto;
+        String pessoaASerExcluida;
+        String nome, dataNasc, dataEntrada, quartoVinculado;
+		boolean achou=false;
+        char resp;
+
+
+        mostrarPessoasCadastradas();
+
+        if (memoriaPessoas.length() != 0) { 
+            System.out.println("\nInforme o nome da pessoa que deseja excluir: ");
+            pessoaASerExcluida = scan.next();
+			inicio = 0;
+			while ((inicio != memoriaPessoas.length()) && (!achou)) {
+				ultimo = memoriaPessoas.indexOf ("\t", inicio);
+				nome = memoriaPessoas.substring(inicio, ultimo);
+
+                primeiro = ultimo + 1;
+				ultimo = memoriaPessoas.indexOf ("\t", primeiro); 
+				dataNasc = memoriaPessoas.substring(primeiro, ultimo);	
+
+				primeiro = ultimo + 1;
+                ultimo = memoriaPessoas.indexOf ("\t", primeiro); 
+				dataEntrada = memoriaPessoas.substring(primeiro, ultimo);	
+
+                primeiro = ultimo + 1;
+                fim = memoriaPessoas.indexOf ("\n", primeiro);
+				quartoVinculado = memoriaPessoas.substring(primeiro, fim);
+
+                Pessoa pessoa = new Pessoa(nome, dataNasc, dataEntrada, Integer.parseInt(quartoVinculado));
+                if (nome.equalsIgnoreCase(pessoaASerExcluida)){
+					System.out.println("\n\nDeseja excluir?\nDigite S ou N:\n\n"+
+							"\nNome: "+pessoa.getNome()+
+							"\nData Nascimento: " +pessoa.getDataNascimento()+
+							"\nData de Entrada: "+pessoa.getDataEntrada() + 
+                            "\nQuarto: "+pessoa.getNumAcomodacao());
+					resp = Character.toUpperCase(scan.next().charAt(0));
+					if (resp == 'S'){
+						memoriaPessoas.delete (inicio, fim + 1);	
+                        excluirUmaPessoaNaAcomodacao(quartoVinculado);
+						System.out.println("\nRegistro excluido.");
+						gravarDados(ARQUIVO_PESSOAS, memoriaPessoas); 
+					} else{
+						System.out.println("\nExclusao cancelada.");
+					}
+					achou = true;
+				}
+                inicio = fim + 1;
+            }
+            if (!achou) {
+				System.out.println("\nPessoa nao encontrada! ");
+			}
+        }
+    }
+
+    public static void menuConsultarDados() {
+        System.out.println("\n\n\nACOMODACOES:");
+        mostrarAcomodacoesCadastradas();
+        System.out.println("\n\n\nPESSOAS:");
+        mostrarPessoasCadastradas();
+    }
+
+
+
+
+
+    public static void mostrarAcomodacoesCadastradas() {
+        int inicio, fim, ultimo, primeiro;
+        String numAcomodacao, valor, tipo, pessoasNaAcomodacao;
         if (memoriaAcomodacoes.length() > 0) {
             inicio = 0;
             while ((inicio != memoriaAcomodacoes.length())) {
 				ultimo = memoriaAcomodacoes.indexOf ("\t", inicio);
-				numQuarto = memoriaAcomodacoes.substring(inicio, ultimo);
+				numAcomodacao = memoriaAcomodacoes.substring(inicio, ultimo);
+
+				primeiro = ultimo + 1;
+				ultimo = memoriaAcomodacoes.indexOf ("\t", primeiro); 	
+
+				primeiro = ultimo + 1;
+                ultimo = memoriaAcomodacoes.indexOf ("\t", primeiro); 
+				valor = memoriaAcomodacoes.substring(primeiro, ultimo);	
+                
+                primeiro = ultimo + 1;
+                ultimo = memoriaAcomodacoes.indexOf ("\t", primeiro);
+				tipo = memoriaAcomodacoes.substring(primeiro, ultimo);
+
+                primeiro = ultimo + 1;
+                fim = memoriaAcomodacoes.indexOf ("\n", primeiro);
+				pessoasNaAcomodacao = memoriaAcomodacoes.substring(primeiro, fim);
+
+				inicio = fim + 1;
+                
+                System.out.println("\n *** Quarto "+ numAcomodacao + " ***" +
+                "\nValor: " + valor +
+                "\nTipo: "+ tipo +
+                "\nPessoas no quarto: "+ pessoasNaAcomodacao);            
+			}
+        } else {
+            System.out.println("Nenhuma acomodaçao cadastrada!");
+        }
+    }
+
+    public static void mostrarAcomodacoesDisponiveis() {
+        int inicio, fim, ultimo, primeiro;
+        String numAcomodacao, valor, disponivel, tipo, pessoasNaAcomodacao;
+        if (memoriaAcomodacoes.length() > 0) {
+            inicio = 0;
+            while ((inicio != memoriaAcomodacoes.length())) {
+				ultimo = memoriaAcomodacoes.indexOf ("\t", inicio);
+				numAcomodacao = memoriaAcomodacoes.substring(inicio, ultimo);
 
 				primeiro = ultimo + 1;
 				ultimo = memoriaAcomodacoes.indexOf ("\t", primeiro); 
@@ -141,15 +324,15 @@ public class CasaDeRepousoMain {
 
                 primeiro = ultimo + 1;
                 fim = memoriaAcomodacoes.indexOf ("\n", primeiro);
-				pessoasNoQuarto = memoriaAcomodacoes.substring(primeiro, fim);
+				pessoasNaAcomodacao = memoriaAcomodacoes.substring(primeiro, fim);
 
 				inicio = fim + 1;
 
                 if(disponivel.equals("true")){
-                    System.out.println("\n *** Quarto "+ numQuarto + " ***" +
+                    System.out.println("\n *** Quarto "+ numAcomodacao + " ***" +
                     "\nValor: " + valor +
                     "\nTipo: "+ tipo +
-                    "\nPessoas no quarto: "+ pessoasNoQuarto);
+                    "\nPessoas no quarto: "+ pessoasNaAcomodacao);
                 }
 			}
         } else {
@@ -297,77 +480,6 @@ public class CasaDeRepousoMain {
         }
     }
 
-    static void menuAlterarDadosPessoa() {
-        String pessoaASerAlterada, opcao, novaInfo;
-        boolean naoAlterou = true;
-
-        mostrarPessoasCadastradas();
-
-        if (memoriaPessoas.length() > 0) {
-            while (true) {
-                System.out.println("\nInforme o nome da pessoa que deseja alterar alguma informação: ");
-                pessoaASerAlterada = scan.next();
-
-                if (validarPessoa(pessoaASerAlterada)) {
-                    break;
-                } else {
-                    System.out.println("\nNome informado nao cadastrado, tente novamente!");
-                }
-            }
-            
-            do {
-                System.out.println("\nQual informação deseja alterar?" +
-                "\n1 - Nome" +
-                "\n2 - Data de Nascimento" +
-                "\n3 - Data de Entrada" +
-                "\n4 - Quarto do cliente");
-
-                opcao = scan.next();
-
-                switch (opcao) {
-                    case "1":
-                        System.out.println("\nInforme o novo nome: ");
-                        novaInfo = scan.next();
-                        alterarDadosPessoa(pessoaASerAlterada, novaInfo, "nome");
-                        naoAlterou = false;
-                        break;
-                    case "2":
-                        System.out.println("\nInforme a nova data de nascimento: ");
-                        novaInfo = scan.next();
-                        alterarDadosPessoa(pessoaASerAlterada, novaInfo, "dataNascimento");
-                        naoAlterou = false;
-                        break;
-                    case "3":
-                        System.out.println("\nInforme a nova data de entrada: ");
-                        novaInfo = scan.next();
-                        alterarDadosPessoa(pessoaASerAlterada, novaInfo, "dataEntrada");
-                        naoAlterou = false;
-                        break;
-                    case "4":
-                        if (existemAcomodacoesDisponiveis()) {
-                            while (true) {
-                                mostrarAcomodacoesDisponiveis();
-                                System.out.println("\nInforme o novo quarto do cliente: ");
-                                novaInfo = scan.next();
-                                if (validarAcomodacao(novaInfo)) {
-                                    alterarDadosPessoa(pessoaASerAlterada, novaInfo, "quarto");
-                                    break;
-                                } else {
-                                    System.out.println("\nNúmero inválido, tente novamente.");
-                                }
-                            }
-                        } else {
-                            System.out.println("\nNão há acomodacoes disponíveis. ");
-                        }
-                        naoAlterou = false;
-                        break;
-                    default:
-                        System.out.println("\nOpção Inválida!");
-                }
-            } while (naoAlterou);
-        }
-    }
-
     static void alterarDadosPessoa(String nomeProcurado, String novaInfo, String campoASerAlterado){
 		int inicio, fim, ultimo, primeiro;
         String nome, dataNasc, dataEntrada, quartoVinculado;
@@ -499,65 +611,5 @@ public class CasaDeRepousoMain {
             }
             inicio = fim + 1; 
 		}
-	}
-
-    static void excluirDadosPessoa() {
-        int inicio, fim, ultimo, primeiro;
-        String pessoaASerExcluida;
-        String nome, dataNasc, dataEntrada, quartoVinculado;
-		boolean achou=false;
-        char resp;
-
-
-        mostrarPessoasCadastradas();
-
-        if (memoriaPessoas.length() != 0) { 
-            System.out.println("\nInforme o nome da pessoa que deseja excluir: ");
-            pessoaASerExcluida = scan.next();
-			inicio = 0;
-			while ((inicio != memoriaPessoas.length()) && (!achou)) {
-				ultimo = memoriaPessoas.indexOf ("\t", inicio);
-				nome = memoriaPessoas.substring(inicio, ultimo);
-
-                primeiro = ultimo + 1;
-				ultimo = memoriaPessoas.indexOf ("\t", primeiro); 
-				dataNasc = memoriaPessoas.substring(primeiro, ultimo);	
-
-				primeiro = ultimo + 1;
-                ultimo = memoriaPessoas.indexOf ("\t", primeiro); 
-				dataEntrada = memoriaPessoas.substring(primeiro, ultimo);	
-
-                primeiro = ultimo + 1;
-                fim = memoriaPessoas.indexOf ("\n", primeiro);
-				quartoVinculado = memoriaPessoas.substring(primeiro, fim);
-
-                Pessoa pessoa = new Pessoa(nome, dataNasc, dataEntrada, Integer.parseInt(quartoVinculado));
-                if (nome.equalsIgnoreCase(pessoaASerExcluida)){
-					System.out.println("\n\nDeseja excluir?\nDigite S ou N:\n\n"+
-							"\nNome: "+pessoa.getNome()+
-							"\nData Nascimento: " +pessoa.getDataNascimento()+
-							"\nData de Entrada: "+pessoa.getDataEntrada() + 
-                            "\nQuarto: "+pessoa.getNumAcomodacao());
-					resp = Character.toUpperCase(scan.next().charAt(0));
-					if (resp == 'S'){
-						memoriaPessoas.delete (inicio, fim + 1);	
-                        excluirUmaPessoaNaAcomodacao(quartoVinculado);
-						System.out.println("\nRegistro excluido.");
-						gravarDados(ARQUIVO_PESSOAS, memoriaPessoas); 
-					} else{
-						System.out.println("\nExclusao cancelada.");
-					}
-					achou = true;
-				}
-                inicio = fim + 1;
-            }
-            if (!achou){
-				System.out.println("\nPessoa nao encontrada! ");
-			}
-        }
-    }
-
-    public static void consultarDados(String filename) {
-        
-    }       
+	} 
 }
