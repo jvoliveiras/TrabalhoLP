@@ -1,2 +1,0 @@
-10	true	250.0	individual	0
-6	true	240.0	duplo	0

@@ -45,10 +45,6 @@ public class Acomodacao {
         this.pessoasNaAcomodacao = pessoasNaAcomodacao;
     }
 
-    public void adicionarPessoa() {
-        this.pessoasNaAcomodacao += 1;
-    }
-
     public String toString() {
         return this.numAcomodacao+"\t"+estaDisponivel+"\t"+preco+"\t"+tipo+"\t"+pessoasNaAcomodacao+"\n";
     }
