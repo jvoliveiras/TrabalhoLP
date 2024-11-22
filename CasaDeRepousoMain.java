@@ -99,6 +99,7 @@ public class CasaDeRepousoMain {
                 
                 Pessoa pessoa = new Pessoa(nome, dataNascimento, dataEntrada, Integer.parseInt(numAcomodacao));
                 memoriaPessoas.append(pessoa.toString());
+                adicionarUmaPessoaNaAcomodacao(numAcomodacao);
                 gravarDados(ARQUIVO_PESSOAS, memoriaPessoas);
             } else {
                 System.out.println("\nNão há acomodacoes disponíveis. ");
@@ -148,7 +149,7 @@ public class CasaDeRepousoMain {
         }
     }
 
-    public static void listaPessoasCadastradas() {
+    public static void mostrarPessoasCadastradas() {
         int inicio, fim, ultimo, primeiro;
         String nome, dataNasc, dataEntrada, quartoVinculado;
         iniciarArquivo(ARQUIVO_PESSOAS, memoriaPessoas);
@@ -294,7 +295,7 @@ public class CasaDeRepousoMain {
 
     static void menuAlterarDadosPessoa() {
         String pessoaASerAlterada, opcao, novaInfo;
-        listaPessoasCadastradas();
+        mostrarPessoasCadastradas();
         boolean naoAlterou = true;
 
         if (memoriaPessoas.length() > 0) {
@@ -409,6 +410,53 @@ public class CasaDeRepousoMain {
 		}
     }
 
+    static void adicionarUmaPessoaNaAcomodacao(String numAcomodacao){
+		int inicio, fim, ultimo, primeiro;
+        String numAcomodacaoTemp, estaDisponivel, valor, tipo, pessoasNaAcomodacao;
+        int numPessoasNaAcomodacao, maxPessoas = 0;
+        boolean disponivel;
+
+		inicio = 0;
+		while (inicio != memoriaAcomodacoes.length()) {
+			ultimo = memoriaAcomodacoes.indexOf ("\t", inicio);
+			numAcomodacaoTemp = memoriaAcomodacoes.substring(inicio, ultimo);
+
+			primeiro = ultimo + 1;
+			ultimo = memoriaAcomodacoes.indexOf ("\t", primeiro); 
+			estaDisponivel = memoriaAcomodacoes.substring(primeiro, ultimo);	
+
+			primeiro = ultimo + 1;
+            ultimo = memoriaAcomodacoes.indexOf ("\t", primeiro); 
+			valor = memoriaAcomodacoes.substring(primeiro, ultimo);
+
+            primeiro = ultimo + 1;
+            ultimo = memoriaAcomodacoes.indexOf ("\t", primeiro); 
+			tipo = memoriaAcomodacoes.substring(primeiro, ultimo);
+
+            primeiro = ultimo + 1;
+            fim = memoriaAcomodacoes.indexOf ("\n", primeiro);
+			pessoasNaAcomodacao = memoriaAcomodacoes.substring(primeiro, fim);
+
+            if (numAcomodacao.equals(numAcomodacaoTemp)) {
+                numPessoasNaAcomodacao = Integer.parseInt(pessoasNaAcomodacao) + 1;
+                disponivel = estaDisponivel.equals("true");
+
+                if (tipo.equals("individual")) maxPessoas = 1;
+                if (tipo.equals("duplo")) maxPessoas = 2;
+                if (tipo.equals("triplo")) maxPessoas = 3;
+            
+                if (numPessoasNaAcomodacao == maxPessoas) disponivel = false;
+
+                String acomodacao = numAcomodacaoTemp+"\t"+disponivel+"\t"+valor+"\t"+tipo+"\t"+numPessoasNaAcomodacao+"\n";
+
+                memoriaAcomodacoes.replace(inicio, fim + 1, acomodacao);
+                gravarDados(ARQUIVO_ACOMODACAO, memoriaAcomodacoes);
+                break;
+            }
+            inicio = fim + 1; 
+		}
+	}
+
     static void excluirDadosPessoa() {
         int inicio, fim, ultimo, primeiro;
         String pessoaASerExcluida;
@@ -416,7 +464,7 @@ public class CasaDeRepousoMain {
 		boolean achou=false;
         char resp;
 
-        listaPessoasCadastradas();
+        mostrarPessoasCadastradas();
 
         if (memoriaPessoas.length() != 0) { 
             System.out.println("\nInforme o nome da pessoa que deseja excluir: ");
