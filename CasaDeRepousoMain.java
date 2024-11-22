@@ -14,6 +14,8 @@ public class CasaDeRepousoMain {
     public static void main(String[] args) {
         System.out.println("PROGRAMA DESENVOLVIDO POR BERNARDO AUGUSTO LODI E JOÃO VICTOR OLIVEIRA.");
         char menu = 0;
+        iniciarArquivo(ARQUIVO_PESSOAS, memoriaPessoas);
+        iniciarArquivo(ARQUIVO_ACOMODACAO, memoriaAcomodacoes);
         do {
             System.out.println("\n Digite a opçao que deseja: "+
             "\n1 - Adicionar nova acomodação. "+
@@ -25,6 +27,7 @@ public class CasaDeRepousoMain {
             "\n7 - Sair. "+
             "\n>>> Opção:");
             menu = scan.next().charAt(0);
+    
             switch (menu) {
                 case '1':
                     adicionarAcomodacao();
@@ -38,9 +41,15 @@ public class CasaDeRepousoMain {
                 case '4':
                     excluirDadosPessoa();
                     break;
+                case '5':
+                    break;
+                case '6':
+                    break;
                 case '7':
                     System.out.println();
                     break;
+                case 'a':
+                 System.out.println("aaaaaaaaa");
                 default:
                     break;
             }
@@ -48,10 +57,9 @@ public class CasaDeRepousoMain {
     }
 
     static void adicionarAcomodacao() {
-        String tipo;
+        String tipo, numAcomodacao;
         boolean estaDisponivel = true;
         double preco;
-        int numAcomodacao;
         try {
             while (true) {
                 System.out.println("\nInforme o tipo do quarto: (individual, duplo ou triplo)");
@@ -62,12 +70,13 @@ public class CasaDeRepousoMain {
                     System.out.println("\nTipo de quarto inválido, tente novamente.");
                 }
             }
+            //to_do: integer no try/while
             System.out.println("\nInforme o número do quarto: ");
-            numAcomodacao = scan.nextInt();
+            numAcomodacao = scan.next();
             System.out.println("\nInforme o preço mensal do quarto: ");
             preco = scan.nextDouble();
 
-            Acomodacao acomodacao = new Acomodacao(estaDisponivel, preco, tipo, numAcomodacao);
+            Acomodacao acomodacao = new Acomodacao(estaDisponivel, preco, tipo, Integer.parseInt(numAcomodacao));
             memoriaAcomodacoes.append(acomodacao.toString());
             gravarDados(ARQUIVO_ACOMODACAO, memoriaAcomodacoes);
         } catch (Exception e) {
@@ -112,7 +121,6 @@ public class CasaDeRepousoMain {
     public static void mostrarAcomodacoesDisponiveis() {
         int inicio, fim, ultimo, primeiro;
         String numQuarto, valor, disponivel, tipo, pessoasNoQuarto;
-        iniciarArquivo(ARQUIVO_ACOMODACAO, memoriaAcomodacoes);
         if (memoriaAcomodacoes.length() > 0) {
             inicio = 0;
             while ((inicio != memoriaAcomodacoes.length())) {
@@ -152,7 +160,6 @@ public class CasaDeRepousoMain {
     public static void mostrarPessoasCadastradas() {
         int inicio, fim, ultimo, primeiro;
         String nome, dataNasc, dataEntrada, quartoVinculado;
-        iniciarArquivo(ARQUIVO_PESSOAS, memoriaPessoas);
         if (memoriaPessoas.length() > 0) {
             inicio = 0;
             while ((inicio != memoriaPessoas.length())) {
@@ -185,7 +192,6 @@ public class CasaDeRepousoMain {
 
     public static boolean existemAcomodacoesDisponiveis() {
         int inicio, fim, ultimo, primeiro;
-        iniciarArquivo(ARQUIVO_ACOMODACAO, memoriaAcomodacoes);
         String disponivel;
         boolean estaDisponivel = false;
         if (memoriaAcomodacoes.length() > 0) {
@@ -213,7 +219,6 @@ public class CasaDeRepousoMain {
 
     public static boolean validarAcomodacao (String numAcomodacao) {
         int inicio, fim, ultimo, primeiro;
-        iniciarArquivo(ARQUIVO_ACOMODACAO, memoriaAcomodacoes);
         String numAcomodacaoTemp, estaDisponivel;
         boolean numeroDeQuartoDisponivel = false;
         if (memoriaAcomodacoes.length() > 0) {
@@ -242,7 +247,6 @@ public class CasaDeRepousoMain {
 
     public static boolean validarPessoa (String nome) {
         int inicio, fim, ultimo, primeiro;
-        iniciarArquivo(ARQUIVO_PESSOAS, memoriaPessoas);
         String nomeTemp;
         boolean nomeExiste = false;
         
@@ -262,7 +266,7 @@ public class CasaDeRepousoMain {
         return nomeExiste;
     }
 
-    static void iniciarArquivo(String filename, StringBuffer memoria){
+    static void iniciarArquivo(String filename, StringBuffer memoria) {
         try {
             BufferedReader arquivoEntrada = new BufferedReader(new FileReader(filename));
             String linha = "";
@@ -295,8 +299,9 @@ public class CasaDeRepousoMain {
 
     static void menuAlterarDadosPessoa() {
         String pessoaASerAlterada, opcao, novaInfo;
-        mostrarPessoasCadastradas();
         boolean naoAlterou = true;
+
+        mostrarPessoasCadastradas();
 
         if (memoriaPessoas.length() > 0) {
             while (true) {
@@ -398,19 +403,21 @@ public class CasaDeRepousoMain {
                         pessoa.setDataEntrada(novaInfo);
                         break;
                     case "quarto":
+                        excluirUmaPessoaNaAcomodacao(quartoVinculado);
+                        adicionarUmaPessoaNaAcomodacao(novaInfo);
                         pessoa.setNumAcomodacao(Integer.parseInt(novaInfo));
                         break;
                 }
-				
 				memoriaPessoas.replace(inicio, fim+1, pessoa.toString());
 				gravarDados(ARQUIVO_PESSOAS, memoriaPessoas);
                 System.out.println("\nDado alterado com sucesso! ");
+                break;
 			}
 			inicio = fim + 1; 
 		}
     }
 
-    static void adicionarUmaPessoaNaAcomodacao(String numAcomodacao){
+    static void adicionarUmaPessoaNaAcomodacao(String numAcomodacao) {
 		int inicio, fim, ultimo, primeiro;
         String numAcomodacaoTemp, estaDisponivel, valor, tipo, pessoasNaAcomodacao;
         int numPessoasNaAcomodacao, maxPessoas = 0;
@@ -457,12 +464,50 @@ public class CasaDeRepousoMain {
 		}
 	}
 
+    static void excluirUmaPessoaNaAcomodacao(String numAcomodacao) {
+		int inicio, fim, ultimo, primeiro;
+        String numAcomodacaoTemp, valor, tipo, pessoasNaAcomodacao;
+        int numPessoasNaAcomodacao;
+
+		inicio = 0;
+		while (inicio != memoriaAcomodacoes.length()) {
+			ultimo = memoriaAcomodacoes.indexOf ("\t", inicio);
+			numAcomodacaoTemp = memoriaAcomodacoes.substring(inicio, ultimo);
+
+			primeiro = ultimo + 1;
+			ultimo = memoriaAcomodacoes.indexOf ("\t", primeiro); 
+
+			primeiro = ultimo + 1;
+            ultimo = memoriaAcomodacoes.indexOf ("\t", primeiro); 
+			valor = memoriaAcomodacoes.substring(primeiro, ultimo);
+
+            primeiro = ultimo + 1;
+            ultimo = memoriaAcomodacoes.indexOf ("\t", primeiro); 
+			tipo = memoriaAcomodacoes.substring(primeiro, ultimo);  
+
+            primeiro = ultimo + 1;
+            fim = memoriaAcomodacoes.indexOf ("\n", primeiro);
+			pessoasNaAcomodacao = memoriaAcomodacoes.substring(primeiro, fim);
+
+            if (numAcomodacao.equals(numAcomodacaoTemp)) {
+                numPessoasNaAcomodacao = Integer.parseInt(pessoasNaAcomodacao) - 1;
+                String acomodacao = numAcomodacaoTemp+"\ttrue\t"+valor+"\t"+tipo+"\t"+numPessoasNaAcomodacao+"\n";
+
+                memoriaAcomodacoes.replace(inicio, fim + 1, acomodacao);
+                gravarDados(ARQUIVO_ACOMODACAO, memoriaAcomodacoes);
+                break;
+            }
+            inicio = fim + 1; 
+		}
+	}
+
     static void excluirDadosPessoa() {
         int inicio, fim, ultimo, primeiro;
         String pessoaASerExcluida;
         String nome, dataNasc, dataEntrada, quartoVinculado;
 		boolean achou=false;
         char resp;
+
 
         mostrarPessoasCadastradas();
 
@@ -496,10 +541,11 @@ public class CasaDeRepousoMain {
 					resp = Character.toUpperCase(scan.next().charAt(0));
 					if (resp == 'S'){
 						memoriaPessoas.delete (inicio, fim + 1);	
-						System.out.println("Registro excluido.");
+                        excluirUmaPessoaNaAcomodacao(quartoVinculado);
+						System.out.println("\nRegistro excluido.");
 						gravarDados(ARQUIVO_PESSOAS, memoriaPessoas); 
 					} else{
-						System.out.println("Exclusao cancelada.");
+						System.out.println("\nExclusao cancelada.");
 					}
 					achou = true;
 				}
