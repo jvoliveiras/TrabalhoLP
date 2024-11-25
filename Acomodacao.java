@@ -1,5 +1,4 @@
 public class Acomodacao {
-    //to_do:criar restricao para quartos de mesmo numero
     private boolean estaDisponivel;
     private double preco;
     private String tipo;
