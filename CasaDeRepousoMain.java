@@ -102,8 +102,6 @@ public class CasaDeRepousoMain {
     
     static void menuAdicionarPessoa() {
         String cpf, nome, dataNascimento, dataEntrada, numAcomodacao;
-        @SuppressWarnings("unused")
-        long cpfInt;
         try {
             if (existemAcomodacoesDisponiveis()) {
                 System.out.println("\nAcomodações disponíveis: ");
@@ -125,7 +123,7 @@ public class CasaDeRepousoMain {
                     cpf = scan.next();
                     if (cpf.matches("\\d{11}")) {
                         try {
-                            cpfInt = Long.parseLong(cpf);
+                            Long.parseLong(cpf);
                             if (existePessoa(cpf)) {
                                 System.out.println("\nCPF informado já existe!");
                             } else {

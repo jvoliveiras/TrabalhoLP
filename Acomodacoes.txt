@@ -15,4 +15,4 @@
 15	true	130.0	triplo	0
 16	true	150.0	triplo	0
 17	true	180.0	triplo	0
-18	true	200.0	triplo	0
+18	true	200.0	triplo	1
