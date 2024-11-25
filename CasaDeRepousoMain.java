@@ -23,7 +23,7 @@ public class CasaDeRepousoMain {
             "\n3 - Alterar dados de alguma pessoa. "+
             "\n4 - Excluir dados de alguma pessoa. "+
             "\n5 - Consultar todos os dados. "+
-            "\n6 - Consultar um dado expecífico. "+
+            "\n6 - Consultar pessoas em uma acomodacao (consulta especifica). "+
             "\n7 - Sair. "+
             "\n>>> Opção:");
             menu = scan.next().charAt(0);
@@ -45,6 +45,7 @@ public class CasaDeRepousoMain {
                     menuConsultarDados();
                     break;
                 case '6':
+                    menuConsultaEspecifica();
                     break;
                 case '7':
                     System.out.println("\nPrograma encerrado!");
@@ -205,7 +206,6 @@ public class CasaDeRepousoMain {
 		boolean achou=false;
         char resp;
 
-
         mostrarPessoasCadastradas();
 
         if (memoriaPessoas.length() != 0) { 
@@ -260,10 +260,6 @@ public class CasaDeRepousoMain {
         System.out.println("\n\n\nPESSOAS:");
         mostrarPessoasCadastradas();
     }
-
-
-
-
 
     public static void mostrarAcomodacoesCadastradas() {
         int inicio, fim, ultimo, primeiro;
@@ -612,4 +608,83 @@ public class CasaDeRepousoMain {
             inicio = fim + 1; 
 		}
 	} 
+
+    static void menuConsultaEspecifica() {
+        String numAcomodacao;
+        System.out.println("\nInforme o número da acomodação que deseja verificar os ocupantes: ");
+
+        while(true){
+            mostrarAcomodacoesCadastradas();
+
+            System.out.println("\nInforme o número da acomodação que deseja verificar os ocupantes: ");
+            numAcomodacao = scan.next();
+
+            if(existeAcomodacao(numAcomodacao)) {
+                mostrarPessoasNumaAcomodacao(numAcomodacao);
+                break;
+            } else {
+                System.out.println("\nAcomodação informada nao cadastrada, tente novamente!");
+            }
+
+        }
+    }
+
+    public static boolean existeAcomodacao(String numAcomodacao) {
+        int inicio, fim, ultimo, primeiro;
+        String acomodacaoTemp;
+        boolean acomodacaoExiste = false;
+        
+        inicio = 0;
+        while ((inicio != memoriaAcomodacoes.length())) {
+			ultimo = memoriaAcomodacoes.indexOf ("\t", inicio);
+            acomodacaoTemp = memoriaAcomodacoes.substring(inicio, ultimo);
+
+            primeiro = ultimo + 1;
+            fim = memoriaAcomodacoes.indexOf ("\n", primeiro);
+			inicio = fim + 1;
+            if (acomodacaoTemp.equals(numAcomodacao) ) {
+                acomodacaoExiste = true;
+                break;
+            }
+		}
+        return acomodacaoExiste;
+    }
+
+    public static void mostrarPessoasNumaAcomodacao(String numAcomodacao) {
+        int inicio, fim, ultimo, primeiro;
+        String numAcomodacaoTemp, nome, dataNasc, dataEntrada;
+        boolean achouAlgumaPessoa = false;
+
+        inicio = 0;
+        while ((inicio != memoriaPessoas.length())) {
+            ultimo = memoriaPessoas.indexOf ("\t", inicio);
+            nome = memoriaPessoas.substring(inicio, ultimo);
+
+            primeiro = ultimo + 1;
+            ultimo = memoriaPessoas.indexOf ("\t", primeiro); 
+            dataNasc = memoriaPessoas.substring(primeiro, ultimo);	
+
+            primeiro = ultimo + 1;
+            ultimo = memoriaPessoas.indexOf ("\t", primeiro); 
+            dataEntrada = memoriaPessoas.substring(primeiro, ultimo);	
+
+            primeiro = ultimo + 1;
+            fim = memoriaPessoas.indexOf ("\n", primeiro);
+            numAcomodacaoTemp = memoriaPessoas.substring(primeiro, fim);
+
+            inicio = fim + 1;
+
+            if(numAcomodacaoTemp.equals(numAcomodacao)){
+                achouAlgumaPessoa = true;
+                System.out.println("\n *** Cliente "+ nome + " ***" +
+                "\nData de Nascimento: " + dataNasc +
+                "\nData de Entrada: "+ dataEntrada +
+                "\nQuarto do cliente: "+ numAcomodacaoTemp);
+            }
+		}
+
+        if(!achouAlgumaPessoa){
+            System.out.println("Nenhuma pessoa encontrada nessa acomodação!");
+        }
+    }
 }
