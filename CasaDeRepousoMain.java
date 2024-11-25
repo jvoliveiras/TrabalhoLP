@@ -77,7 +77,11 @@ public class CasaDeRepousoMain {
                 numAcomodacao = scan.next();
                 try {
                     numAcomod = Integer.parseInt(numAcomodacao);
-                    break;
+                    if(existeAcomodacao(numAcomodacao)){
+                        System.out.println("\nNumero da acomodacao informada ja existe!");
+                    } else {
+                        break;
+                    }
                 } catch (Exception e) {
                     System.out.println("\nDigite um numero!");
                 }
@@ -255,10 +259,38 @@ public class CasaDeRepousoMain {
     }
 
     public static void menuConsultarDados() {
-        System.out.println("\n\n\nACOMODACOES:");
-        mostrarAcomodacoesCadastradas();
-        System.out.println("\n\n\nPESSOAS:");
-        mostrarPessoasCadastradas();
+        String opcao;
+        while(true) {
+            System.out.println("\nQual dado deseja consultar?" +
+            "\n1 - Acomodacoes" +
+            "\n2 - Pessoas" +
+            "\n3 - Ambos os dados"); 
+    
+            opcao = scan.next();
+
+            switch (opcao) {
+                case "1":
+                    System.out.println("\n\n\nACOMODACOES:");
+                    mostrarAcomodacoesCadastradas();
+                    break;
+                case "2":
+                    System.out.println("\n\n\nPESSOAS:");
+                    mostrarPessoasCadastradas();
+                    break;
+                case "3":
+                    System.out.println("\n\n\nACOMODACOES:");
+                    mostrarAcomodacoesCadastradas();
+                    System.out.println("\n\n\nPESSOAS:");
+                    mostrarPessoasCadastradas();
+                    break;
+                default:
+                    System.out.println("Digite uma opcao valida!");
+            }
+
+            if (opcao.equals("1") || opcao.equals("2") || opcao.equals("3")) {
+                break;
+            }
+        }
     }
 
     public static void mostrarAcomodacoesCadastradas() {
