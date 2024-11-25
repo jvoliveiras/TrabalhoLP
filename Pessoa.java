@@ -1,16 +1,21 @@
 public class Pessoa {
+    private String cpf;
     private String nome;
     private String dataNascimento;
     private String dataEntrada;
     private int numAcomodacao;
 
-    public Pessoa(String nome, String dataNascimento, String dataEntrada, int numAcomodacao ) {
+    public Pessoa(String cpf, String nome, String dataNascimento, String dataEntrada, int numAcomodacao ) {
+        this.cpf = cpf;
         this.numAcomodacao = numAcomodacao;
         this.nome = nome;
         this.dataNascimento = dataNascimento;
         this.dataEntrada = dataEntrada;
     }
 
+    public String getCpf() {
+        return cpf;
+    }
     public String getNome() {
         return nome;
     }
@@ -37,6 +42,6 @@ public class Pessoa {
     }
 
     public String toString() {
-        return this.nome+"\t"+dataNascimento+"\t"+dataEntrada+"\t"+numAcomodacao+"\n";
+        return this.cpf+"\t"+this.nome+"\t"+dataNascimento+"\t"+dataEntrada+"\t"+numAcomodacao+"\n";
     }
 }
