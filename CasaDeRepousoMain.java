@@ -333,6 +333,7 @@ public class CasaDeRepousoMain {
 
     static void menuConsultaEspecifica() {
         String numAcomodacao;
+        mostrarAcomodacoesCadastradas();
         while (true) {
             System.out.println("\nInforme o número da acomodação que deseja verificar os ocupantes ou \"sair\" para voltar ao menu: ");
             numAcomodacao = scan.next();
