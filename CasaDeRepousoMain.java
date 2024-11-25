@@ -99,7 +99,7 @@ public class CasaDeRepousoMain {
     }
     
     static void menuAdicionarPessoa() {
-        String nome, dataNascimento, dataEntrada, numAcomodacao;
+        String cpf, nome, dataNascimento, dataEntrada, numAcomodacao;
         try {
             if (existemAcomodacoesDisponiveis()) {
                 while (true) {
@@ -113,6 +113,17 @@ public class CasaDeRepousoMain {
                         System.out.println("\nNúmero inválido, tente novamente.");
                     }
                 }
+
+                while (true) {
+                    System.out.println("\nInforme o cpf da nova pessoa (apenas numeros): ");
+                    cpf = scan.next();
+                    if(existePessoa(cpf)){
+                        System.out.println("\nCPF informado ja existe!");
+                    } else {
+                        break;
+                    }
+                }
+                
                 System.out.println("\nInforme o nome da nova pessoa: ");
                 nome = scan.next();
                 System.out.println("\nInforme a data de nascimento: ");
@@ -120,7 +131,7 @@ public class CasaDeRepousoMain {
                 System.out.println("\nInforme a data de entrada da pessoa: ");
                 dataEntrada = scan.next();
                 
-                Pessoa pessoa = new Pessoa(nome, dataNascimento, dataEntrada, Integer.parseInt(numAcomodacao));
+                Pessoa pessoa = new Pessoa(cpf, nome, dataNascimento, dataEntrada, Integer.parseInt(numAcomodacao));
                 memoriaPessoas.append(pessoa.toString());
                 adicionarUmaPessoaNaAcomodacao(numAcomodacao);
                 gravarDados(ARQUIVO_PESSOAS, memoriaPessoas);
@@ -134,19 +145,19 @@ public class CasaDeRepousoMain {
     }
 
     static void menuAlterarDadosPessoa() {
-        String pessoaASerAlterada, opcao, novaInfo;
+        String cpfASerAlterado, opcao, novaInfo;
         boolean naoAlterou = true;
         mostrarPessoasCadastradas();
 
         if (memoriaPessoas.length() > 0) {
             while (true) {
-                System.out.println("\nInforme o nome da pessoa que deseja alterar alguma informação: ");
-                pessoaASerAlterada = scan.next();
+                System.out.println("\nInforme o cpf da pessoa que deseja alterar alguma informação (apenas numeros): ");
+                cpfASerAlterado = scan.next();
 
-                if (validarPessoa(pessoaASerAlterada)) {
+                if (existePessoa(cpfASerAlterado)) {
                     break;
                 } else {
-                    System.out.println("\nNome informado nao cadastrado, tente novamente!");
+                    System.out.println("\nCPF informado nao cadastrado, tente novamente!");
                 }
             }
             
@@ -163,19 +174,19 @@ public class CasaDeRepousoMain {
                     case "1":
                         System.out.println("\nInforme o novo nome: ");
                         novaInfo = scan.next();
-                        alterarDadosPessoa(pessoaASerAlterada, novaInfo, "nome");
+                        alterarDadosPessoa(cpfASerAlterado, novaInfo, "nome");
                         naoAlterou = false;
                         break;
                     case "2":
                         System.out.println("\nInforme a nova data de nascimento: ");
                         novaInfo = scan.next();
-                        alterarDadosPessoa(pessoaASerAlterada, novaInfo, "dataNascimento");
+                        alterarDadosPessoa(cpfASerAlterado, novaInfo, "dataNascimento");
                         naoAlterou = false;
                         break;
                     case "3":
                         System.out.println("\nInforme a nova data de entrada: ");
                         novaInfo = scan.next();
-                        alterarDadosPessoa(pessoaASerAlterada, novaInfo, "dataEntrada");
+                        alterarDadosPessoa(cpfASerAlterado, novaInfo, "dataEntrada");
                         naoAlterou = false;
                         break;
                     case "4":
@@ -185,7 +196,7 @@ public class CasaDeRepousoMain {
                                 System.out.println("\nInforme o novo quarto do cliente: ");
                                 novaInfo = scan.next();
                                 if (validarAcomodacao(novaInfo)) {
-                                    alterarDadosPessoa(pessoaASerAlterada, novaInfo, "quarto");
+                                    alterarDadosPessoa(cpfASerAlterado, novaInfo, "quarto");
                                     break;
                                 } else {
                                     System.out.println("\nNúmero inválido, tente novamente.");
@@ -206,19 +217,23 @@ public class CasaDeRepousoMain {
     static void menuExcluirDadosPessoa() {
         int inicio, fim, ultimo, primeiro;
         String pessoaASerExcluida;
-        String nome, dataNasc, dataEntrada, quartoVinculado;
+        String cpf, nome, dataNasc, dataEntrada, quartoVinculado;
 		boolean achou=false;
         char resp;
 
         mostrarPessoasCadastradas();
 
         if (memoriaPessoas.length() != 0) { 
-            System.out.println("\nInforme o nome da pessoa que deseja excluir: ");
+            System.out.println("\nInforme o cpf da pessoa que deseja excluir: ");
             pessoaASerExcluida = scan.next();
 			inicio = 0;
 			while ((inicio != memoriaPessoas.length()) && (!achou)) {
 				ultimo = memoriaPessoas.indexOf ("\t", inicio);
-				nome = memoriaPessoas.substring(inicio, ultimo);
+				cpf = memoriaPessoas.substring(inicio, ultimo);
+
+                primeiro = ultimo + 1;
+				ultimo = memoriaPessoas.indexOf ("\t", primeiro); 
+				nome = memoriaPessoas.substring(primeiro, ultimo);	
 
                 primeiro = ultimo + 1;
 				ultimo = memoriaPessoas.indexOf ("\t", primeiro); 
@@ -232,9 +247,10 @@ public class CasaDeRepousoMain {
                 fim = memoriaPessoas.indexOf ("\n", primeiro);
 				quartoVinculado = memoriaPessoas.substring(primeiro, fim);
 
-                Pessoa pessoa = new Pessoa(nome, dataNasc, dataEntrada, Integer.parseInt(quartoVinculado));
-                if (nome.equalsIgnoreCase(pessoaASerExcluida)){
+                Pessoa pessoa = new Pessoa(cpf, nome, dataNasc, dataEntrada, Integer.parseInt(quartoVinculado));
+                if (cpf.equals(pessoaASerExcluida)){
 					System.out.println("\n\nDeseja excluir?\nDigite S ou N:\n\n"+
+                            "\nCPF: "+pessoa.getCpf()+
 							"\nNome: "+pessoa.getNome()+
 							"\nData Nascimento: " +pessoa.getDataNascimento()+
 							"\nData de Entrada: "+pessoa.getDataEntrada() + 
@@ -370,12 +386,16 @@ public class CasaDeRepousoMain {
 
     public static void mostrarPessoasCadastradas() {
         int inicio, fim, ultimo, primeiro;
-        String nome, dataNasc, dataEntrada, quartoVinculado;
+        String cpf, nome, dataNasc, dataEntrada, quartoVinculado;
         if (memoriaPessoas.length() > 0) {
             inicio = 0;
             while ((inicio != memoriaPessoas.length())) {
 				ultimo = memoriaPessoas.indexOf ("\t", inicio);
-				nome = memoriaPessoas.substring(inicio, ultimo);
+				cpf = memoriaPessoas.substring(inicio, ultimo);
+
+                primeiro = ultimo + 1;
+				ultimo = memoriaPessoas.indexOf ("\t", primeiro); 
+				nome = memoriaPessoas.substring(primeiro, ultimo);	
 
 				primeiro = ultimo + 1;
 				ultimo = memoriaPessoas.indexOf ("\t", primeiro); 
@@ -392,6 +412,7 @@ public class CasaDeRepousoMain {
 				inicio = fim + 1;
 
                 System.out.println("\n *** Cliente "+ nome + " ***" +
+                "\nCPF: " + cpf +
                 "\nData de Nascimento: " + dataNasc +
                 "\nData de Entrada: "+ dataEntrada +
                 "\nQuarto do cliente: "+ quartoVinculado);
@@ -456,27 +477,6 @@ public class CasaDeRepousoMain {
         return numeroDeQuartoDisponivel;
     }
 
-    public static boolean validarPessoa (String nome) {
-        int inicio, fim, ultimo, primeiro;
-        String nomeTemp;
-        boolean nomeExiste = false;
-        
-        inicio = 0;
-        while ((inicio != memoriaPessoas.length())) {
-			ultimo = memoriaPessoas.indexOf ("\t", inicio);
-            nomeTemp = memoriaPessoas.substring(inicio, ultimo);
-
-            primeiro = ultimo + 1;
-            fim = memoriaPessoas.indexOf ("\n", primeiro);
-			inicio = fim + 1;
-            if (nomeTemp.equalsIgnoreCase(nome) ) {
-                nomeExiste = true;
-                break;
-            }
-		}
-        return nomeExiste;
-    }
-
     static void iniciarArquivo(String filename, StringBuffer memoria) {
         try {
             BufferedReader arquivoEntrada = new BufferedReader(new FileReader(filename));
@@ -508,14 +508,18 @@ public class CasaDeRepousoMain {
         }
     }
 
-    static void alterarDadosPessoa(String nomeProcurado, String novaInfo, String campoASerAlterado){
+    static void alterarDadosPessoa(String cpfProcurado, String novaInfo, String campoASerAlterado){
 		int inicio, fim, ultimo, primeiro;
-        String nome, dataNasc, dataEntrada, quartoVinculado;
+        String cpf, nome, dataNasc, dataEntrada, quartoVinculado;
 
 		inicio = 0;
 		while (inicio != memoriaPessoas.length()) {
 			ultimo = memoriaPessoas.indexOf ("\t", inicio);
-			nome = memoriaPessoas.substring(inicio, ultimo);
+			cpf = memoriaPessoas.substring(inicio, ultimo);
+
+            primeiro = ultimo + 1;
+			ultimo = memoriaPessoas.indexOf ("\t", primeiro); 
+			nome = memoriaPessoas.substring(primeiro, ultimo);	
 
 			primeiro = ultimo + 1;
 			ultimo = memoriaPessoas.indexOf ("\t", primeiro); 
@@ -529,9 +533,9 @@ public class CasaDeRepousoMain {
             fim = memoriaPessoas.indexOf ("\n", primeiro);
 			quartoVinculado = memoriaPessoas.substring(primeiro, fim);
 
-			Pessoa pessoa = new Pessoa(nome, dataNasc, dataEntrada, Integer.parseInt(quartoVinculado));
+			Pessoa pessoa = new Pessoa(cpf, nome, dataNasc, dataEntrada, Integer.parseInt(quartoVinculado));
 
-			if (nomeProcurado.equalsIgnoreCase(pessoa.getNome())) {
+			if (cpfProcurado.equals(pessoa.getCpf())) {
                 switch (campoASerAlterado) {
                     case "nome":
                         pessoa.setNome(novaInfo);
@@ -657,7 +661,6 @@ public class CasaDeRepousoMain {
             } else {
                 System.out.println("\nAcomodação informada nao cadastrada, tente novamente!");
             }
-
         }
     }
 
@@ -682,15 +685,40 @@ public class CasaDeRepousoMain {
         return acomodacaoExiste;
     }
 
+    public static boolean existePessoa(String cpf) {
+        int inicio, fim, ultimo, primeiro;
+        String cpfTemp;
+        boolean pessoaExiste = false;
+        
+        inicio = 0;
+        while ((inicio != memoriaPessoas.length())) {
+			ultimo = memoriaPessoas.indexOf ("\t", inicio);
+            cpfTemp = memoriaPessoas.substring(inicio, ultimo);
+
+            primeiro = ultimo + 1;
+            fim = memoriaPessoas.indexOf ("\n", primeiro);
+			inicio = fim + 1;
+            if (cpfTemp.equals(cpf) ) {
+                pessoaExiste = true;
+                break;
+            }
+		}
+        return pessoaExiste;
+    }
+
     public static void mostrarPessoasNumaAcomodacao(String numAcomodacao) {
         int inicio, fim, ultimo, primeiro;
-        String numAcomodacaoTemp, nome, dataNasc, dataEntrada;
+        String numAcomodacaoTemp, cpf, nome, dataNasc, dataEntrada;
         boolean achouAlgumaPessoa = false;
 
         inicio = 0;
         while ((inicio != memoriaPessoas.length())) {
             ultimo = memoriaPessoas.indexOf ("\t", inicio);
-            nome = memoriaPessoas.substring(inicio, ultimo);
+            cpf = memoriaPessoas.substring(inicio, ultimo);
+
+            primeiro = ultimo + 1;
+            ultimo = memoriaPessoas.indexOf ("\t", primeiro); 
+            nome = memoriaPessoas.substring(primeiro, ultimo);	
 
             primeiro = ultimo + 1;
             ultimo = memoriaPessoas.indexOf ("\t", primeiro); 
@@ -709,6 +737,7 @@ public class CasaDeRepousoMain {
             if(numAcomodacaoTemp.equals(numAcomodacao)){
                 achouAlgumaPessoa = true;
                 System.out.println("\n *** Cliente "+ nome + " ***" +
+                "\nCPF: " + cpf +
                 "\nData de Nascimento: " + dataNasc +
                 "\nData de Entrada: "+ dataEntrada +
                 "\nQuarto do cliente: "+ numAcomodacaoTemp);
